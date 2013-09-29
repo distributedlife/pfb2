@@ -121,4 +121,18 @@ describe 'the schedule' do
 			chinese.interval("好").should be 25
 		end
 	end
+
+	describe "time of next review" do
+		it "should return the time of the next review" do
+			@db['schedule'].insert({:language => 'chinese', :what => "你", :interval => 5, :when => @start + 5})
+
+			chinese.time_of_next_review.to_s.should eq (@start + 5).to_s
+		end
+
+		it "should return nil if there are no words scheduled" do
+			@db['schedule'].remove
+
+			chinese.time_of_next_review.nil?.should be_true
+		end
+	end
 end

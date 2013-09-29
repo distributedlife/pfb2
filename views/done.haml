@@ -1,3 +1,10 @@
 %script{:type => "text/javascript", :src => "/js/jquery.js"}
 #language=language
 Done
+%p#next_review= time_of_next_review
+
+:javascript
+	var reload_review_page = function() {
+		window.location.replace("/#{language}/review")
+	};
+	window.setTimeout(reload_review_page, 30000);

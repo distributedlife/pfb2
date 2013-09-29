@@ -41,4 +41,12 @@ class Schedule
 			collection.update({:_id => schedule['_id']}, {"$set" => {:interval => new_interval }})
 		end
 	end
+
+	def time_of_next_review
+		what = collection.find({:language => @language}).sort({:when => ascending}).first
+
+		return nil if what.nil?
+
+		what['when']
+	end
 end

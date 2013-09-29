@@ -28,14 +28,14 @@ require './routes/api_routes'
 		conn = MongoClient.new("localhost", 27017)
 		set :db, conn.db('production')
 
-		BoomCrashOpera.reset! conn.db
+		BoomCrashOpera.reset! settings.db
 	end
 
 	get '/' do
 	 	haml :index, :format => :html5
 	end
 
-	def setup_thing_for_language language
+	def setup_things_for language
 		@interval = Interval.new language, settings.db
 		@schedule = Schedule.new language, settings.db
 		@dataset = YAML.load_file("#{language}.yaml")['words']
@@ -44,8 +44,7 @@ require './routes/api_routes'
 	get '/:language/review' do |language|
 		redirect "/" unless supported_languages.include? language
 
-		setup_thing_for_language language
-
+		setup_things_for language
 		bco = BoomCrashOpera.new @interval, @schedule, @dataset
 		
 		redirect "/#{language}/done" if bco.next_word_to_review.nil?
@@ -56,7 +55,7 @@ require './routes/api_routes'
 	get '/:language/:word/review/success' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		setup_thing_for_language language
+		setup_things_for language
 
 		bco = BoomCrashOpera.new @interval, @schedule, @dataset
 		bco.advance_word! word
@@ -67,18 +66,21 @@ require './routes/api_routes'
 	get '/:language/:word/review/failure' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		setup_thing_for_language language
+		setup_things_for language
 		bco = BoomCrashOpera.new @interval, @schedule, @dataset
 		bco.reset_word! word
 
 		redirect "/#{language}/review"
 	end
 
+	get '/:language/done' do |language|
+		redirect "/" unless supported_languages.include? language
 
+		setup_things_for language
 
-	get '/:langauge/done' do |language|
-		haml :done, :format => :html5, :locals => {:language => language}
+		haml :done, :format => :html5, :locals => {:language => language, :time_of_next_review => @schedule.time_of_next_review}
 	end
+
 
 	get '/languages' do
 		json :supported_languages => supported_languages
