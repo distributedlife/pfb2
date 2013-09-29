@@ -1,7 +1,6 @@
 # encoding: utf-8
-require 'yaml'
 
-class BoomCrashOpera
+class PushFlashBang
 	def next_word_to_review
 		unless @interval.setup?
 			@interval.setup!

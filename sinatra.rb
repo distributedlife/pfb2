@@ -5,12 +5,13 @@ require 'sinatra/json'
 require 'haml'
 require 'mongo'
 require 'json/ext'
-require './lib/boom_crash_opera'
+require 'yaml'
+require './lib/push_flash_bang'
 require './lib/interval'
 require './lib/schedule'
 require './routes/api_routes'
 
-# class BoomCrashOpera < Sinatra::Base
+# class PushFlashBang < Sinatra::Base
 	include Mongo
 	include Sinatra::ApiRoutes
 
@@ -28,7 +29,7 @@ require './routes/api_routes'
 		conn = MongoClient.new("localhost", 27017)
 		set :db, conn.db('production')
 
-		BoomCrashOpera.reset! settings.db
+		PushFlashBang.reset! settings.db
 	end
 
 	get '/' do
@@ -45,7 +46,7 @@ require './routes/api_routes'
 		redirect "/" unless supported_languages.include? language
 
 		setup_things_for language
-		bco = BoomCrashOpera.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @dataset
 		
 		redirect "/#{language}/done" if bco.next_word_to_review.nil?
 
@@ -57,7 +58,7 @@ require './routes/api_routes'
 
 		setup_things_for language
 
-		bco = BoomCrashOpera.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @dataset
 		bco.advance_word! word
 
 		redirect "/#{language}/review"
@@ -67,7 +68,7 @@ require './routes/api_routes'
 		redirect "/" unless supported_languages.include? language
 
 		setup_things_for language
-		bco = BoomCrashOpera.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @dataset
 		bco.reset_word! word
 
 		redirect "/#{language}/review"
