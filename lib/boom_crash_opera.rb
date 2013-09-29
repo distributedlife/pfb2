@@ -52,10 +52,14 @@ class BoomCrashOpera
 			@schedule.add! @to_learn.first['word'], @interval.first
 		end
 
+		if @schedule.next_word.nil?
+			add_new_word_to_schedule
+		end
+
 		@schedule.next_word
 	end
 
-	def learn_next_word
+	def add_new_word_to_schedule
 		@to_learn.each do |item|
 			next if @schedule.scheduled? item['word']
 

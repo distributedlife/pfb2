@@ -42,12 +42,8 @@ require './routes/api_routes'
 
 		interval = Interval.new language, settings.db
 		schedule = Schedule.new language, settings.db
-		dataset = YAML.load_file('characters.yaml')[language]
+		dataset = YAML.load_file("#{language}.yaml")[language]
 		bco = BoomCrashOpera.new interval, schedule, dataset
-
-		if bco.next_revision.nil?
-			bco.learn_next_word
-		end
 		
 		review = bco.next_revision
 		redirect "/#{language}/done" if review.nil?
@@ -60,7 +56,7 @@ require './routes/api_routes'
 
 		interval = Interval.new language, settings.db
 		schedule = Schedule.new language, settings.db
-		dataset = YAML.load_file('characters.yaml')[language]
+		dataset = YAML.load_file("#{language}.yaml")[language]
 		bco = BoomCrashOpera.new interval, schedule, dataset
 
 		bco.schedule_next_review! word
@@ -73,7 +69,7 @@ require './routes/api_routes'
 
 		interval = Interval.new language, settings.db
 		schedule = Schedule.new language, settings.db
-		dataset = YAML.load_file('characters.yaml')[language]
+		dataset = YAML.load_file("#{language}.yaml")[language]
 		bco = BoomCrashOpera.new interval, schedule, dataset
 
 		bco.reset_schedule! word
@@ -94,7 +90,7 @@ require './routes/api_routes'
 	get '/:langauge/:word' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		set = YAML.load_file('characters.yaml')[language]
+		set = YAML.load_file("#{language}.yaml")[language]
 
 		json :language => language, :word => set.select {|items| items['word'] == word}.first
 	end
