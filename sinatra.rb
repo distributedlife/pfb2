@@ -35,31 +35,31 @@ require './routes/api_routes'
 	 	haml :index, :format => :html5
 	end
 
-
+	def setup_thing_for_language language
+		@interval = Interval.new language, settings.db
+		@schedule = Schedule.new language, settings.db
+		@dataset = YAML.load_file("#{language}.yaml")['words']
+	end
 
 	get '/:language/review' do |language|
 		redirect "/" unless supported_languages.include? language
 
-		interval = Interval.new language, settings.db
-		schedule = Schedule.new language, settings.db
-		dataset = YAML.load_file("#{language}.yaml")[language]
-		bco = BoomCrashOpera.new interval, schedule, dataset
-		
-		review = bco.next_revision
-		redirect "/#{language}/done" if review.nil?
+		setup_thing_for_language language
 
-		haml :review, :format => :html5, :locals => { :language => language, :review =>  review}
+		bco = BoomCrashOpera.new @interval, @schedule, @dataset
+		
+		redirect "/#{language}/done" if bco.next_word_to_review.nil?
+
+		haml :review, :format => :html5, :locals => { :language => language, :review =>  bco.next_word_to_review}
 	end
 
 	get '/:language/:word/review/success' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		interval = Interval.new language, settings.db
-		schedule = Schedule.new language, settings.db
-		dataset = YAML.load_file("#{language}.yaml")[language]
-		bco = BoomCrashOpera.new interval, schedule, dataset
+		setup_thing_for_language language
 
-		bco.schedule_next_review! word
+		bco = BoomCrashOpera.new @interval, @schedule, @dataset
+		bco.advance_word! word
 
 		redirect "/#{language}/review"
 	end
@@ -67,12 +67,9 @@ require './routes/api_routes'
 	get '/:language/:word/review/failure' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		interval = Interval.new language, settings.db
-		schedule = Schedule.new language, settings.db
-		dataset = YAML.load_file("#{language}.yaml")[language]
-		bco = BoomCrashOpera.new interval, schedule, dataset
-
-		bco.reset_schedule! word
+		setup_thing_for_language language
+		bco = BoomCrashOpera.new @interval, @schedule, @dataset
+		bco.reset_word! word
 
 		redirect "/#{language}/review"
 	end
@@ -87,10 +84,10 @@ require './routes/api_routes'
 		json :supported_languages => supported_languages
 	end
 
-	get '/:langauge/:word' do |language, word|
+	get '/:language/:word' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		set = YAML.load_file("#{language}.yaml")[language]
+		set = YAML.load_file("#{language}.yaml")['words']
 
 		json :language => language, :word => set.select {|items| items['word'] == word}.first
 	end

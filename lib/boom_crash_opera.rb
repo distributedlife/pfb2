@@ -1,49 +1,8 @@
 # encoding: utf-8
 require 'yaml'
 
-module Mongo
-	@db = nil
-	@name = nil
-
-	def collection
-		@db[@name]
-	end
-
-	def create!
-		@db.create_collection(@name) unless @db.collection_names.include? @name
-	end
-
-	def ascending
-		1
-	end
-
-	def descending
-		-1
-	end
-
-	def reset!
-		@db.drop_collection @name
-	end
-
-	def empty?
-		collection.count == 0
-	end
-end
-
-module Language
-	@language = nil
-
-	def language
-		return @language
-	end
-
-	def empty?
-		collection.find(:language => language).count == 0
-	end
-end
-
 class BoomCrashOpera
-	def next_revision
+	def next_word_to_review
 		unless @interval.setup?
 			@interval.setup!
 		end
@@ -68,7 +27,7 @@ class BoomCrashOpera
 		end
 	end
 
-	def reset_schedule! word
+	def reset_word! word
 		current_interval = @schedule.interval word
 
 		@interval.add_failure current_interval
@@ -85,7 +44,7 @@ class BoomCrashOpera
 		@schedule.update! word, @interval.first
 	end
 
-	def schedule_next_review! word
+	def advance_word! word
 		current_interval = @schedule.interval word
 
 		@interval.add_success current_interval
