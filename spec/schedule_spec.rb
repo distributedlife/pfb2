@@ -126,7 +126,7 @@ describe 'the schedule' do
 		it "should return the time of the next review" do
 			@db['schedule'].insert({:language => 'chinese', :what => "你", :interval => 5, :when => @start + 5})
 
-			chinese.time_of_next_review.to_s.should eq (@start + 5).to_s
+			chinese.time_of_next_review.should eq "less than a minute"
 		end
 
 		it "should return nil if there are no words scheduled" do

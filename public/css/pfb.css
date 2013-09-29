@@ -1,0 +1,31 @@
+#question {
+	font-size: 8em;
+}
+
+#question p {
+	text-align: center;
+	margin: 0;
+	padding: 0;
+}
+
+#answer p {
+	text-align: center;
+	margin: 0;
+	padding: 0;
+
+	font-size: 2em;
+}
+
+#meaning {
+	color: grey;
+}
+
+em {
+	color: orange;
+}
+
+.pronunciation {
+	margin-top: 5px;
+	padding-top: 5px;
+	border-top: 1px solid grey;
+}

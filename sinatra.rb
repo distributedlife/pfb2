@@ -9,6 +9,7 @@ require 'yaml'
 require './lib/push_flash_bang'
 require './lib/interval'
 require './lib/schedule'
+require './lib/pronunciation_guidance'
 require './routes/api_routes'
 
 # class PushFlashBang < Sinatra::Base
@@ -91,8 +92,11 @@ require './routes/api_routes'
 		redirect "/" unless supported_languages.include? language
 
 		set = YAML.load_file("#{language}.yaml")['words']
+		item = set.select {|items| items['word'] == word}.first
+		
+		item['pronunciation'] = PronunciationGuidance.chinese item['guide']
 
-		json :language => language, :word => set.select {|items| items['word'] == word}.first
+		json :language => language, :word => item
 	end
 
 	# run! if app_file == $0

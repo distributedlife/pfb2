@@ -1,7 +1,9 @@
 require './lib/mongo_helpers'
+require 'action_view'
 
 class Schedule
 	include MongoHelpers
+	include ActionView::Helpers::DateHelper
 
 	def initialize language, db
 		@language = language
@@ -47,6 +49,6 @@ class Schedule
 
 		return nil if what.nil?
 
-		what['when']
+		distance_of_time_in_words_to_now what['when']
 	end
 end

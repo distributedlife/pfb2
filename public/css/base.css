@@ -1,0 +1,84 @@
+.header {
+	font-size: 2em;
+}
+.notice {
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	border:1px solid #000000;
+
+	margin: 2px; 
+	padding: 5px;
+
+	font-size: 1.4em;
+}
+
+.button-area {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 96%;
+	margin: 2% 3%;
+}
+
+.button {
+	font-size: 3em; 
+	
+	padding-bottom: 5px;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+	border:1px solid #000000;
+	background-color:#CAC3E3;
+	
+	text-align: center;
+	cursor: pointer;
+
+	font-variant: small-caps;
+}
+
+.button:hover {
+	background-color:#78E39C;
+}
+
+.half {
+	display: inline-block;
+	width: 48%;
+	margin: 0;
+	text-align: center;
+}
+
+.pass {
+	background-color: green;
+}
+
+.fail {
+	background-color: red;
+}
+
+a.normal {
+	color: orange;
+}
+
+a.normal:hover {
+	text-decoration: underline;
+}
+
+a {
+	color: black;
+	text-decoration: none;
+}
+
+a:visted {
+	color: black;
+}
+
+a:hover {
+	
+}
+
+.hidden {
+	display: none;
+}

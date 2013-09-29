@@ -1,21 +1,32 @@
+%link{:rel => "stylesheet", :href => "/css/base.css", :type => "text/css"}
+%link{:rel => "stylesheet", :href => "/css/pfb.css", :type => "text/css"}
 %script{:type => "text/javascript", :src => "/js/jquery.js"}
+
 #question
-  = review
   %p.what= review['what']
-  %a#reveal.action{:href=> "#"}reveal
+
 #answer.hidden
+  %p#meaning
   .pronunciation
     %p#guide
     %p#explanatory
-  %p#english
+
+.button-area
+  .button#reveal
+    %a.action{:href=> "#"}reveal
+
 #options.hidden
-  %a#pass.action{:href=> "/#{language}/#{review['what']}/review/success"}pass
-  %a#fail.action{:href=> "/#{language}/#{review['what']}/review/failure"}fail
+  .button-area
+    .button.half.fail
+      %a#fail.action{:href=> "/#{language}/#{review['what']}/review/failure"}fail
+    .button.half.pass
+      %a#pass.action{:href=> "/#{language}/#{review['what']}/review/success"}pass
 
 :javascript
   var update_answer = function(data) {
-    $("#english").text(data['word']['english'])
+    $("#meaning").text(data['word']['meaning'])
     $("#guide").text(data['word']['guide'])
+    $("#explanatory").append(data['word']['pronunciation'])
   }
 
   var do_reveal = function() {
