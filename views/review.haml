@@ -1,0 +1,32 @@
+%script{:type => "text/javascript", :src => "/js/jquery.js"}
+#question
+  = review
+  %p.what= review['what']
+  %a#reveal.action{:href=> "#"}reveal
+#answer.hidden
+  .pronunciation
+    %p#guide
+    %p#explanatory
+  %p#english
+#options.hidden
+  %a#pass.action{:href=> "/#{language}/#{review['what']}/review/success"}pass
+  %a#fail.action{:href=> "/#{language}/#{review['what']}/review/failure"}fail
+
+:javascript
+  var update_answer = function(data) {
+    $("#english").text(data['word']['english'])
+    $("#guide").text(data['word']['guide'])
+  }
+
+  var do_reveal = function() {
+    $("#reveal").hide();
+    $("#answer").show();
+    $("#options").show();
+  }
+
+  $.get("/#{language}/#{review['what']}", update_answer);
+  $("#reveal").on('click', function(event) {
+    do_reveal();
+
+    event.preventDefault();
+  });
