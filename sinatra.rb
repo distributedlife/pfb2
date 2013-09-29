@@ -6,6 +6,8 @@ require 'haml'
 require 'mongo'
 require 'json/ext'
 require './lib/boom_crash_opera'
+require './lib/interval'
+require './lib/schedule'
 require './routes/api_routes'
 
 # class BoomCrashOpera < Sinatra::Base
@@ -26,25 +28,28 @@ require './routes/api_routes'
 		conn = MongoClient.new("localhost", 27017)
 		set :db, conn.db('production')
 
-		bco = BoomCrashOpera.new settings.db
-		bco.setup!
+		BoomCrashOpera.reset! conn.db
 	end
 
 	get '/' do
 	 	haml :index, :format => :html5
 	end
 
+
+
 	get '/:language/review' do |language|
 		redirect "/" unless supported_languages.include? language
 
-		bco = BoomCrashOpera.new settings.db
-		review = bco.next_revision(language)
+		interval = Interval.new language, settings.db
+		schedule = Schedule.new language, settings.db
+		dataset = YAML.load_file('characters.yaml')[language]
+		bco = BoomCrashOpera.new interval, schedule, dataset
 
-		if review.nil?
-			bco.learn_next_word language
+		if bco.next_revision.nil?
+			bco.learn_next_word
 		end
 		
-		review = bco.next_revision(language)
+		review = bco.next_revision
 		redirect "/#{language}/done" if review.nil?
 
 		haml :review, :format => :html5, :locals => { :language => language, :review =>  review}
@@ -53,8 +58,12 @@ require './routes/api_routes'
 	get '/:language/:word/review/success' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		bco = BoomCrashOpera.new settings.db
-		bco.schedule_next_review! language, word
+		interval = Interval.new language, settings.db
+		schedule = Schedule.new language, settings.db
+		dataset = YAML.load_file('characters.yaml')[language]
+		bco = BoomCrashOpera.new interval, schedule, dataset
+
+		bco.schedule_next_review! word
 
 		redirect "/#{language}/review"
 	end
@@ -62,11 +71,17 @@ require './routes/api_routes'
 	get '/:language/:word/review/failure' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		bco = BoomCrashOpera.new settings.db
-		bco.reset_schedule! language, word
+		interval = Interval.new language, settings.db
+		schedule = Schedule.new language, settings.db
+		dataset = YAML.load_file('characters.yaml')[language]
+		bco = BoomCrashOpera.new interval, schedule, dataset
+
+		bco.reset_schedule! word
 
 		redirect "/#{language}/review"
 	end
+
+
 
 	get '/:langauge/done' do |language|
 		haml :done, :format => :html5, :locals => {:language => language}

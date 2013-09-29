@@ -25,12 +25,22 @@ describe "in boom crash opera" do
   		Timecop.freeze(@start)
 	end
 
+	before(:each) do
+		@db.drop_collection 'interval'
+		@db.create_collection 'interval'
+
+		@db.drop_collection 'schedule'
+		@db.create_collection 'schedule'
+	end
+
 	describe "when I start a language for the first time" do
 	  	before(:each) do
 	  		get '/chinese/review'
 	  	end
 
 		it "should setup the initial interval for the language" do
+			@db['interval'].count.should be 11
+
 			intervals = @db['interval'].find.to_a
 
 			[5, 25, 120, 600, 3600, 18000, 86400, 432000, 2160000, 10368000, 63072000].each_with_index do |interval, index|
@@ -38,8 +48,6 @@ describe "in boom crash opera" do
 				intervals[index]['sequence'].should eq 0
 				intervals[index]['language'].should eq "chinese"
 			end
-			
-			@db['interval'].count.should be 11
 		end
 
 		it "should schedule the first word" do

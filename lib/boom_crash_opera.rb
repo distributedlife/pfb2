@@ -1,7 +1,5 @@
 # encoding: utf-8
 require 'yaml'
-require './lib/interval'
-require './lib/schedule'
 
 module Mongo
 	@db = nil
@@ -45,88 +43,71 @@ module Language
 end
 
 class BoomCrashOpera
-	def next_revision language
-		all_in_language = YAML.load_file('characters.yaml')[language]
-
-		unless @interval.setup_for_language? language
-			@interval.setup_for_language language
+	def next_revision
+		unless @interval.setup?
+			@interval.setup!
 		end
 
 		if @schedule.empty?
-			word = all_in_language.first['word']
-
-			@schedule.add! language, word, @interval.first['interval']
+			@schedule.add! @to_learn.first['word'], @interval.first
 		end
 
-		@schedule.next language
+		@schedule.next_word
 	end
 
-	def learn_next_word language
-		all_in_language = YAML.load_file('characters.yaml')[language]
+	def learn_next_word
+		@to_learn.each do |item|
+			next if @schedule.scheduled? item['word']
 
-		all_in_language.each do |item|
-			unless @schedule.in_shedule(language, item['word'])
-				@schedule.add! language, item['word'], @interval.first['interval']
-				return
-			end
+			@schedule.add! item['word'], @interval.first
+			return
 		end
 	end
 
-	def reset_schedule! language, word
-		current_interval = @schedule.current_interval language, word
+	def reset_schedule! word
+		current_interval = @schedule.interval word
 
-		@interval.add_failure language, current_interval
+		@interval.add_failure current_interval
 
-		if @interval.sequence(language, current_interval) <= -10
-			prior_interval = @interval.prior current_interval
+		if @interval.get(current_interval)['sequence'] <= -10
+			prior_interval = @interval.previous current_interval
 			new_interval = (current_interval + prior_interval).to_f / 2
 
-			@interval.replace language, current_interval, new_interval
+			@interval.replace current_interval, new_interval
 
-			@schedule.transition language, current_interval, new_interval
+			@schedule.transition current_interval, new_interval
 		end
 
-		@schedule.update! language, word, @interval.first['interval']
+		@schedule.update! word, @interval.first
 	end
 
-	def schedule_next_review! language, word
-		current_interval = @schedule.current_interval language, word
+	def schedule_next_review! word
+		current_interval = @schedule.interval word
 
-		@interval.add_success language, current_interval
+		@interval.add_success current_interval
 
-		if @interval.sequence(language, current_interval) >= 10
+		if @interval.get(current_interval)['sequence'] >= 10
 			next_interval = @interval.next current_interval
 			new_interval = (current_interval + next_interval).to_f / 2
 
-			@interval.replace language, current_interval, new_interval
+			@interval.replace current_interval, new_interval
 
-			@schedule.transition language, current_interval, new_interval
+			@schedule.transition current_interval, new_interval
 		end
 
-		@schedule.update! language, word, @interval.next(current_interval)
+		@schedule.update! word, @interval.next(current_interval)
 	end
 
-	def initialize db
-		@interval = Interval.new db
-		@schedule = Schedule.new db
+	def initialize interval, schedule, dataset
+		@interval = interval
+		@schedule = schedule
+		@to_learn = dataset
 	end
 
-	def collections
-		['intervals', 'schedule']
-	end
-
-	def reset!
-		@interval.reset!
-		@schedule.reset!
-	end
-
-	def create!
-		@interval.create!
-		@schedule.create!
-	end
-
-	def setup!
-		reset!
-		create!
+	def self.reset! db
+		['interval', 'schedule'].each do |name|
+			db.drop_collection name
+			db.create_collection name
+		end
 	end
 end
