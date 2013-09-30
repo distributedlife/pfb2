@@ -1,0 +1,124 @@
+b:
+  default: <em>b</em>oy
+c:
+  default: ea<em>ts</em>
+ch:
+  default: <em>ch</em>ildren
+d:
+  default: <em>d</em>ig
+f:
+  default: <em>f</em>ood
+g:
+  default: <em>g</em>ood
+h:
+  default: <em>h</em>ot
+j:
+  default: <em>j</em>eep
+k:
+  default: <em>k</em>id
+l:
+  default: <em>l</em>oud
+m:
+  default: <em>m</em>other
+n:
+  default: <em>n</em>imble
+ng:
+  default: so<em>ng</em>
+p:
+  default: <em>p</em>ine
+q:
+  default: <em>ch</em>eat
+r:
+  default: <em>r</em>aw
+t:
+  default: <em>t</em>alk
+s:
+  default: <em>s</em>on
+sh:
+  default: <em>sh</em>ake
+w:
+  default: <em>w</em>e
+x:
+  default: <em>s</em>ee/<em>sh</em>e
+y:
+  default: <em>y</em>ou
+z:
+  default: wor<em>ds</em>
+zh:
+  default: slu<em>dg</em>e
+a:
+  variations:
+    - use: "c<em>a</em>sh"
+      when:
+        - rule: previous
+          value: ["ī", "í", "ǐ", "ì", "i"]
+        - rule: next
+          value: ['n']
+  default: "m<em>a</em>"
+e:
+  variations:
+    - use: "g<em>e</em>t"
+      when:
+        - rule: previous
+          value: ["ī", "í", "ǐ", "ì", "i", "u", "ū", "ú", "ǔ", "ù"]
+  default: "<em>e</em>arn"
+ī:
+  variations:
+    - use: "<em>i</em> like a buzzing bee"
+      when: 
+        - rule: previous
+          value: ["z", "c", "s"]
+    - use: "vocalised <em>r</em>"
+      when:
+        - rule: previous
+          value: ["r"]
+    - use: "vocalised <em>r</em>"
+      when:
+        - rule: previous
+          value: ["h"]
+        - rule: previousprevious
+          value: ["z", "c", "s"]
+  default: "s<em>i</em>t"
+o:
+  variations:
+    - use: "s<em>o</em>w"
+      when: 
+        - rule: next
+          value: ["n"]
+        - rule: nextnext
+          value: ["g"]
+  default: "dr<em>o</em>p"
+u:
+  default: l<em>oo</em>k
+ǚ:
+  default: r<em>u</em>e
+ai:
+  default: <em>eye</em>
+ao:
+  default: h<em>ow</em>
+ei:
+  default: b<em>ay</em>
+ia:
+  default: <em>ea</em>r
+ie:
+  default: <em>air</em>
+iu:
+  default: y<em>ou</em>
+ou:
+  default: l<em>ow</em>er
+ua:
+  default: g<em>ua</em>va
+ui:
+  default: <em>way</em>
+un:
+  default: <em>wun</em>
+uo:
+  default: <em>wa</em>ll
+üa:
+  default: <em>wa</em>
+üe:
+  default: <em>we</em>t
+iao:
+  default: m<em>eow</em>
+uai:
+  default: <em>why</em>
