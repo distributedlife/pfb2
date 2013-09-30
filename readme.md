@@ -14,6 +14,12 @@
 - The spaced repetition is back WITH the dynamic algorithm that tailors to how good you are.
 
 
+# Requires
+- Sinatra hosts the thing
+- YAML files provide content
+- MongoDB is used for persistence. It should run on localhost and the usual port. It should not be public.
+
+
 # Immediate Plans
 
 - Add translation in: See the English, remember the language and how to say it.
