@@ -42,7 +42,7 @@
     if (data['pending'] === 1) {
       $("#pending").text("No pending reviews after this.");
     } else {
-      $("#pending").text(data['pending']);
+      $("#pending").text((data['pending'] - 1) + " reviews after this.");
     }
   };
 
