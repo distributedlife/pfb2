@@ -24,4 +24,3 @@
 
 - Add translation in: See the English, remember the language and how to say it.
 - Add sentences in. A sentence is included if you know all the words in the sentence. If there is a sentence to add, it is added. If there are none, we add a new word
-- Number of reviews pending on the review page

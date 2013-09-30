@@ -22,20 +22,32 @@
     .button.half.pass
       %a#pass.action{:href=> "/#{language}/#{review['what']}/review/success"}pass
 
+.banner
+  %p#pending
+
 :javascript
   var update_answer = function(data) {
     $("#meaning").text(data['word']['meaning'])
     $("#guide").text(data['word']['guide'])
     $("#explanatory").append(data['word']['pronunciation'])
-  }
+  };
 
   var do_reveal = function() {
     $("#reveal").hide();
     $("#answer").show();
     $("#options").show();
-  }
+  };
+
+  var update_review_count = function(data) {
+    if (data['pending'] === 1) {
+      $("#pending").text("No pending reviews after this.");
+    } else {
+      $("#pending").text(data['pending']);
+    }
+  };
 
   $.get("/#{language}/#{review['what']}", update_answer);
+  $.get("/#{language}/review/pending", update_review_count);
   $("#reveal").on('click', function(event) {
     do_reveal();
 

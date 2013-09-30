@@ -135,4 +135,13 @@ describe 'the schedule' do
 			chinese.time_of_next_review.nil?.should be_true
 		end
 	end
+
+	describe "pending review count" do
+		it "should return the pending review count" do
+			@db['schedule'].insert({:language => 'chinese', :what => "你", :interval => 5, :when => @start})
+			@db['schedule'].insert({:language => 'chinese', :what => "好", :interval => 5, :when => @start + 5})
+
+			chinese.pending_reviews.should eq 1
+		end
+	end
 end

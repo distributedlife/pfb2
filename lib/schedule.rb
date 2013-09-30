@@ -30,6 +30,10 @@ class Schedule
 		collection.find({:language => @language, :when => {"$lte" => Time.now }}).sort({:when => ascending}).first
 	end
 
+	def pending_reviews
+		collection.find({:language => @language, :when => {"$lte" => Time.now }}).count
+	end
+
 	def interval what
 		collection.find({:language => @language, :what => what}).first['interval']
 	end

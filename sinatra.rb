@@ -88,6 +88,15 @@ require './routes/api_routes'
 		json :supported_languages => supported_languages
 	end
 
+	get '/:language/review/pending' do |language|
+		redirect "/" unless supported_languages.include? language
+
+		setup_things_for language
+		bco = PushFlashBang.new @interval, @schedule, @dataset
+
+		json :pending => bco.pending_review_count
+	end
+
 	get '/:language/:word' do |language, word|
 		redirect "/" unless supported_languages.include? language
 

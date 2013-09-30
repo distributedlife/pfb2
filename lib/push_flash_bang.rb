@@ -17,6 +17,10 @@ class PushFlashBang
 		@schedule.next_word
 	end
 
+	def pending_review_count
+		@schedule.pending_reviews
+	end
+
 	def add_new_word_to_schedule
 		@to_learn.each do |item|
 			next if @schedule.scheduled? item['word']
