@@ -85,8 +85,9 @@ class PronunciationGuidance
 			    break if matched
 			end
 
-			unless matched 
-			    string << word.char_at(word.offset)
+			unless matched
+				original_character = word.char_at(word.offset) 
+			    string << original_character unless original_character.blank?
 
 			    word.move_to_next
 			end

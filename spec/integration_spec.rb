@@ -56,20 +56,27 @@ describe "in boom crash opera" do
 			@db['schedule'].find.to_a.first['what'].should eq "你"
 		end
 
+		it "should schedule the reverse word" do
+			@db['schedule'].find.to_a.last['what'].should eq "you"
+		end
+
 		it "should only schedule one word" do
-			@db['schedule'].count.should be 1
+			@db['schedule'].count.should be 2
 		end
 
 		it "should set the correct language" do
 			@db['schedule'].find.to_a.first['language'].should eq "chinese"
+			@db['schedule'].find.to_a.last['language'].should eq "chinese"
 		end
 
 		it "should make the card due now" do
 			@db['schedule'].find.to_a.first['when'].to_s.should eq @start.to_s
+			@db['schedule'].find.to_a.last['when'].to_s.should eq @start.to_s
 		end
 
 		it "should set the interval to first interval" do
 			@db['schedule'].find.to_a.first['interval'].should eq 5
+			@db['schedule'].find.to_a.last['interval'].should eq 5
 		end
 
 		it "should not redirect to the language done page" do
@@ -84,7 +91,8 @@ describe "in boom crash opera" do
 
 		context "and there is a word to review" do
 			before(:each) do
-				@db['schedule'].update({:language => 'chinese', :what => '你'}, {"$set" => {:when => @past, :interval => 5 }})
+				@db['schedule'].remove
+				@db['schedule'].insert({:language => 'chinese', :what => '你', :when => @past, :interval => 5 })
 				get '/chinese/review'
 			end
 
@@ -110,23 +118,30 @@ describe "in boom crash opera" do
 				end
 
 				it "should schedule the next allowed sentence" do
-					@db['schedule'].find.to_a.last['what'].should eq "你好"
+					@db['schedule'].find.to_a[2]['what'].should eq "你好"
+				end
+
+				it "should schedule the reverse sentence" do
+					@db['schedule'].find.to_a[3]['what'].should eq "Hello"
 				end
 
 				it "should be two words scheduled" do
-					@db['schedule'].count.should be 3
+					@db['schedule'].count.should be 4
 				end
 
 				it "should set the correct language" do
-					@db['schedule'].find.to_a.last['language'].should eq "chinese"
+					@db['schedule'].find.to_a[2]['language'].should eq "chinese"
+					@db['schedule'].find.to_a[3]['language'].should eq "chinese"
 				end
 
 				it "should make the card due now" do
-					@db['schedule'].find.to_a.last['when'].to_s.should eq @start.to_s
+					@db['schedule'].find.to_a[2]['when'].to_s.should eq @start.to_s
+					@db['schedule'].find.to_a[3]['when'].to_s.should eq @start.to_s
 				end
 
 				it "should set the interval to first interval" do
-					@db['schedule'].find.to_a.last['interval'].should eq 5
+					@db['schedule'].find.to_a[2]['interval'].should eq 5
+					@db['schedule'].find.to_a[3]['interval'].should eq 5
 				end
 
 				it "should not redirect to the language done page" do
@@ -141,23 +156,30 @@ describe "in boom crash opera" do
 				end
 
 				it "should schedule the next word" do
-					@db['schedule'].find.to_a.last['what'].should eq "吗"
+					@db['schedule'].find.to_a[3]['what'].should eq "吗"
+				end
+
+				it "should schedule the reverse word" do
+					@db['schedule'].find.to_a[4]['what'].should eq "question mark"
 				end
 
 				it "should be two words scheduled" do
-					@db['schedule'].count.should be 4
+					@db['schedule'].count.should be 5
 				end
 
 				it "should set the correct language" do
-					@db['schedule'].find.to_a.last['language'].should eq "chinese"
+					@db['schedule'].find.to_a[3]['language'].should eq "chinese"
+					@db['schedule'].find.to_a[4]['language'].should eq "chinese"
 				end
 
 				it "should make the card due now" do
-					@db['schedule'].find.to_a.last['when'].to_s.should eq @start.to_s
+					@db['schedule'].find.to_a[3]['when'].to_s.should eq @start.to_s
+					@db['schedule'].find.to_a[4]['when'].to_s.should eq @start.to_s
 				end
 
 				it "should set the interval to first interval" do
-					@db['schedule'].find.to_a.last['interval'].should eq 5
+					@db['schedule'].find.to_a[3]['interval'].should eq 5
+					@db['schedule'].find.to_a[4]['interval'].should eq 5
 				end
 
 				it "should not redirect to the language done page" do

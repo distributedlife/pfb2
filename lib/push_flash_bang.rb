@@ -27,6 +27,7 @@ class PushFlashBang
 
 	def add_first_word
 		@schedule.add! @words.first['word'], @interval.first
+		@schedule.add! @words.first['meaning'], @interval.first
 	end
 
 	def add_new_sentence_to_schedule
@@ -35,6 +36,7 @@ class PushFlashBang
 
 		unless available_sentences.empty?
 			@schedule.add! available_sentences.first['sentence'], @interval.first
+			@schedule.add! available_sentences.first['meaning'], @interval.first
 		end
 	end
 
@@ -43,6 +45,7 @@ class PushFlashBang
 			next if @schedule.scheduled? item['word']
 
 			@schedule.add! item['word'], @interval.first
+			@schedule.add! item['meaning'], @interval.first
 			return
 		end
 	end

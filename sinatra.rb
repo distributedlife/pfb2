@@ -101,9 +101,16 @@ require './routes/api_routes'
 	get '/:language/:word' do |language, word|
 		redirect "/" unless supported_languages.include? language
 
-		set = YAML.load_file("#{language}.yaml")['words']
-		item = set.select {|items| items['word'] == word}.first
+		words = YAML.load_file("#{language}.yaml")['words']
+		sentences = YAML.load_file("#{language}.yaml")['sentences']
+		item = words.select {|items| items['word'] == word}.first
+		item = words.select {|items| items['meaning'] == word}.first if item.nil?
+		item = sentences.select {|items| items['sentence'] == word}.first if item.nil?
+		item = sentences.select {|items| items['meaning'] == word}.first if item.nil?
 		
+		puts word
+		puts item
+
 		item['pronunciation'] = PronunciationGuidance.chinese item['guide']
 
 		json :language => language, :word => item
