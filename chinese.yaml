@@ -4,7 +4,14 @@ words:
     guide: nǐ
   - word: 好
     meaning: good
-    guide: hao3
-  - word: 你好
-    meaning: hello
-    guide: nǐ hao3
+    guide: hǎo
+  - word: 吗
+    meaning: question mark
+    guide: ma
+sentences:
+  - sentence: 你好吗
+    guide: ní hǎo ma
+    meaning: How are you?
+  - sentence: 你好
+    guide: ní hǎo
+    meaning: Hello

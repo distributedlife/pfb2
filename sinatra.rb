@@ -40,14 +40,15 @@ require './routes/api_routes'
 	def setup_things_for language
 		@interval = Interval.new language, settings.db
 		@schedule = Schedule.new language, settings.db
-		@dataset = YAML.load_file("#{language}.yaml")['words']
+		@word_dataset = YAML.load_file("#{language}.yaml")['words']
+		@sentence_dataset = YAML.load_file("#{language}.yaml")['sentences']
 	end
 
 	get '/:language/review' do |language|
 		redirect "/" unless supported_languages.include? language
 
 		setup_things_for language
-		bco = PushFlashBang.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @word_dataset, @sentence_dataset
 		
 		redirect "/#{language}/done" if bco.next_word_to_review.nil?
 
@@ -59,7 +60,7 @@ require './routes/api_routes'
 
 		setup_things_for language
 
-		bco = PushFlashBang.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @word_dataset, @sentence_dataset
 		bco.advance_word! word
 
 		redirect "/#{language}/review"
@@ -69,7 +70,7 @@ require './routes/api_routes'
 		redirect "/" unless supported_languages.include? language
 
 		setup_things_for language
-		bco = PushFlashBang.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @word_dataset, @sentence_dataset
 		bco.reset_word! word
 
 		redirect "/#{language}/review"
@@ -92,7 +93,7 @@ require './routes/api_routes'
 		redirect "/" unless supported_languages.include? language
 
 		setup_things_for language
-		bco = PushFlashBang.new @interval, @schedule, @dataset
+		bco = PushFlashBang.new @interval, @schedule, @word_dataset, @sentence_dataset
 
 		json :pending => bco.pending_review_count
 	end

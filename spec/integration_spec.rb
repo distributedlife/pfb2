@@ -22,6 +22,8 @@ describe "in boom crash opera" do
 	before(:all) do
   		connect_to_mongo
 		@start = Time.now.utc
+		@past = @start - 1
+		@future = @start + 1
   		Timecop.freeze(@start)
 	end
 
@@ -82,7 +84,7 @@ describe "in boom crash opera" do
 
 		context "and there is a word to review" do
 			before(:each) do
-				@db['schedule'].update({:language => 'chinese', :what => '你'}, {"$set" => {:when => @start - 1, :interval => 5 }})
+				@db['schedule'].update({:language => 'chinese', :what => '你'}, {"$set" => {:when => @past, :interval => 5 }})
 				get '/chinese/review'
 			end
 
@@ -97,32 +99,70 @@ describe "in boom crash opera" do
 
 		context "and there are no words due" do
 			before(:each) do
-				@db['schedule'].update({:language => 'chinese', :what => '你'}, {"$set" => {:when => @start + 1, :interval => 5 }})
-				get '/chinese/review'
+				@db['schedule'].remove
+				@db['schedule'].insert({:language => 'chinese', :what => '你', :when => @future, :interval => 25 })
+				@db['schedule'].insert({:language => 'chinese', :what => '好', :when => @future, :interval => 25 })
 			end
 
-			it "should schedule the next word" do
-				@db['schedule'].find.to_a.last['what'].should eq "好"
+			context "and there are available sentences" do
+				before(:each) do
+					get '/chinese/review'
+				end
+
+				it "should schedule the next allowed sentence" do
+					@db['schedule'].find.to_a.last['what'].should eq "你好"
+				end
+
+				it "should be two words scheduled" do
+					@db['schedule'].count.should be 3
+				end
+
+				it "should set the correct language" do
+					@db['schedule'].find.to_a.last['language'].should eq "chinese"
+				end
+
+				it "should make the card due now" do
+					@db['schedule'].find.to_a.last['when'].to_s.should eq @start.to_s
+				end
+
+				it "should set the interval to first interval" do
+					@db['schedule'].find.to_a.last['interval'].should eq 5
+				end
+
+				it "should not redirect to the language done page" do
+					last_response.should_not be_redirect
+				end
 			end
 
-			it "should be two words scheduled" do
-				@db['schedule'].count.should be 2
-			end
+			context "and there are no new sentences to learn" do
+				before(:each) do
+					@db['schedule'].insert({:language => 'chinese', :what => '你好', :when => @future, :interval => 25 })
+					get '/chinese/review'
+				end
 
-			it "should set the correct language" do
-				@db['schedule'].find.to_a.last['language'].should eq "chinese"
-			end
+				it "should schedule the next word" do
+					@db['schedule'].find.to_a.last['what'].should eq "吗"
+				end
 
-			it "should make the card due now" do
-				@db['schedule'].find.to_a.last['when'].to_s.should eq @start.to_s
-			end
+				it "should be two words scheduled" do
+					@db['schedule'].count.should be 4
+				end
 
-			it "should set the interval to first interval" do
-				@db['schedule'].find.to_a.last['interval'].should eq 5
-			end
+				it "should set the correct language" do
+					@db['schedule'].find.to_a.last['language'].should eq "chinese"
+				end
 
-			it "should not redirect to the language done page" do
-				last_response.should_not be_redirect
+				it "should make the card due now" do
+					@db['schedule'].find.to_a.last['when'].to_s.should eq @start.to_s
+				end
+
+				it "should set the interval to first interval" do
+					@db['schedule'].find.to_a.last['interval'].should eq 5
+				end
+
+				it "should not redirect to the language done page" do
+					last_response.should_not be_redirect
+				end
 			end
 		end
 
@@ -227,7 +267,7 @@ describe "in boom crash opera" do
 			before(:each) do
 				@db['schedule'].remove
 				@db['schedule'].insert({:language => 'chinese', :what => '你', :when => @start, :interval => 25 })
-				@db['schedule'].insert({:language => 'chinese', :what => '你好', :when => @start, :interval => 25 })
+				@db['schedule'].insert({:language => 'chinese', :what => '吗', :when => @start, :interval => 25 })
 				
 				@db['interval'].remove
 				[5.seconds, 25.seconds, 2.minutes, 10.minutes, 1.hour, 5.hours, 1.day, 5.days, 25.days, 4.months, 2.years].each do |interval|
@@ -247,7 +287,7 @@ describe "in boom crash opera" do
 			end			
 
 			it "should update all words at that interval to the new interval" do
-				@db['schedule'].find_one({:language => 'chinese', :what => '你好', :when => @start})['interval'].should eq 72.5
+				@db['schedule'].find_one({:language => 'chinese', :what => '吗', :when => @start})['interval'].should eq 72.5
 			end
 		end
 
@@ -255,7 +295,7 @@ describe "in boom crash opera" do
 			before(:each) do
 				@db['schedule'].remove
 				@db['schedule'].insert({:language => 'chinese', :what => '你', :when => @start, :interval => 25 })
-				@db['schedule'].insert({:language => 'chinese', :what => '你好', :when => @start, :interval => 25 })
+				@db['schedule'].insert({:language => 'chinese', :what => '吗', :when => @start, :interval => 25 })
 				
 				@db['interval'].remove
 				[5.seconds, 25.seconds, 2.minutes, 10.minutes, 1.hour, 5.hours, 1.day, 5.days, 25.days, 4.months, 2.years].each do |interval|
@@ -275,7 +315,7 @@ describe "in boom crash opera" do
 			end
 
 			it "should update all words at that interval to the new interval" do
-				@db['schedule'].find_one({:language => 'chinese', :what => '你好', :when => @start})['interval'].should eq 15
+				@db['schedule'].find_one({:language => 'chinese', :what => '吗', :when => @start})['interval'].should eq 15
 			end
 		end
 	end

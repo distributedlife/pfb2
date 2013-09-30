@@ -7,7 +7,11 @@ class PushFlashBang
 		end
 
 		if @schedule.empty?
-			@schedule.add! @to_learn.first['word'], @interval.first
+			add_first_word
+		end
+
+		if @schedule.next_word.nil?
+			add_new_sentence_to_schedule
 		end
 
 		if @schedule.next_word.nil?
@@ -21,8 +25,21 @@ class PushFlashBang
 		@schedule.pending_reviews
 	end
 
+	def add_first_word
+		@schedule.add! @words.first['word'], @interval.first
+	end
+
+	def add_new_sentence_to_schedule
+		words_learnt = @words.select {|item| @schedule.scheduled? item['word'] }.map {|item| item['word']}
+		available_sentences = @sentences.select { |item| !@schedule.scheduled?(item['sentence']) }.select { |item| (item['sentence'].split("") - words_learnt).empty?}
+
+		unless available_sentences.empty?
+			@schedule.add! available_sentences.first['sentence'], @interval.first
+		end
+	end
+
 	def add_new_word_to_schedule
-		@to_learn.each do |item|
+		@words.each do |item|
 			next if @schedule.scheduled? item['word']
 
 			@schedule.add! item['word'], @interval.first
@@ -64,10 +81,11 @@ class PushFlashBang
 		@schedule.update! word, @interval.next(current_interval)
 	end
 
-	def initialize interval, schedule, dataset
+	def initialize interval, schedule, word_dataset, sentence_dataset
 		@interval = interval
 		@schedule = schedule
-		@to_learn = dataset
+		@words = word_dataset
+		@sentences = sentence_dataset
 	end
 
 	def self.reset! db
