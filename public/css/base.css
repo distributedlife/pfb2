@@ -58,11 +58,11 @@
 	background-color: red;
 }
 
-a.normal {
+.emphasise {
 	color: orange;
 }
 
-a.normal:hover {
+a.emphasise:hover {
 	text-decoration: underline;
 }
 

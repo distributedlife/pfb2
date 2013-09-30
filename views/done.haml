@@ -2,10 +2,13 @@
 %script{:type => "text/javascript", :src => "/js/jquery.js"}
 .notice
 	%p.header Congratulations
-	%p= "All the words for #{language} have been reviewed. Your next review will be due in #{time_of_next_review} from now."
+	%p
+		All the words for #{language} have been reviewed. Your next review will be due in
+		%span.emphasise= time_of_next_review
+		from now.
 	%p
 		This page will refresh in 30 seconds, or you can click
-		%a.normal{:href => "/#{language}/review"} here
+		%a.emphasise{:href => "/#{language}/review"} here
 		and see if new reviews are ready. You'll be redirected back here if there are no reviews ready.
 
 :javascript
